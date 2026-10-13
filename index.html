@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="bn"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>NAZATIAN RUNNER – The Great Escape</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;overflow:hidden;background:#0b1a33;font-family:'Noto Sans Bengali','Hind Siliguri','Kohinoor Bangla','Nirmala UI',Vrinda,Arial,sans-serif;overscroll-behavior:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;object-fit:contain;touch-action:none;background:#4aa8ff}
+.ov{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(8,20,45,.8);color:#fff;text-align:center;padding:14px}
+.ov.on{display:flex}
+#menu{background:rgba(8,20,45,.45)}
+h1{margin:0;font:900 clamp(32px,9vw,64px)/1 Impact,'Arial Black',sans-serif;color:#ffcf33;text-shadow:0 4px 0 #b4570a,0 8px 14px #000;letter-spacing:2px}
+h2{margin:0;font-size:clamp(22px,6vw,40px);color:#ffcf33;text-shadow:0 3px 0 #000}
+p{margin:2px 0;font-size:clamp(14px,3.6vw,18px);max-width:520px}
+.b{font-weight:700;font-size:clamp(16px,4.4vw,20px);font-family:inherit;padding:12px 26px;min-width:180px;border:0;border-radius:16px;background:linear-gradient(#ffd54a,#f0a000);color:#3a2300;box-shadow:0 5px 0 #9a6400,0 8px 12px rgba(0,0,0,.4);cursor:pointer}
+.b:hover{filter:brightness(1.1)}.b:active{transform:translateY(4px);box-shadow:0 1px 0 #9a6400}
+.b.g{background:linear-gradient(#5fd37a,#1f9d45);color:#fff;box-shadow:0 5px 0 #11672c,0 8px 12px rgba(0,0,0,.4)}
+.b.s{background:linear-gradient(#e8eef7,#b6c3d6);box-shadow:0 5px 0 #6b7a90}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}.card{animation:pop .25s ease-out;background:#10315c;border:3px solid #3f86d6;border-radius:20px;padding:18px 22px;box-shadow:0 10px 30px #000a;max-width:92vw}
+#pb,#dots{position:fixed;top:max(8px,env(safe-area-inset-top));width:44px;height:44px;border-radius:12px;border:3px solid #3f86d6;background:#0c2347;color:#fff;font-size:18px;cursor:pointer;display:none;z-index:5}
+#pb{left:8px}#dots{right:8px;display:block;font-size:26px;line-height:1}
+#jb{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));width:min(34vw,150px);height:min(34vw,150px);border-radius:50%;border:4px solid #fff8;background:radial-gradient(#ffd54a,#e08a00);font-weight:900;font-size:18px;font-family:inherit;color:#3a2300;display:none;z-index:4;box-shadow:0 6px 0 #8a5200,0 10px 16px #0007;touch-action:none}
+#jb:active{transform:translateY(4px)}
+a.l{display:flex;align-items:center;gap:12px;color:#fff;text-decoration:none;background:#0c2347;border-radius:12px;padding:10px 14px;margin:8px 0;text-align:left}
+a.l:hover{background:#17407a}a.l svg{width:34px;height:34px;flex:none}
+.big{font-size:clamp(26px,7.5vw,48px);font-weight:800;color:#fff;text-shadow:0 3px 0 #b00020,0 0 14px #ff3b5c;line-height:1.3}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+#rot{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#0b1a33;color:#fff;text-align:center;padding:20px}#rot.on{display:flex}#rot i{font-size:64px;font-style:normal;display:block;animation:rt 1.6s ease-in-out infinite}@keyframes rt{0%,20%{transform:rotate(0)}70%,100%{transform:rotate(-90deg)}}</style></head><body>
+<canvas id="c"></canvas>
+<button id="pb" aria-label="Pause">❚❚</button><button id="dots" aria-label="Developer">⚙</button>
+<button id="jb">JUMP<br>ঝাঁপ</button>
+
+<div class="ov on" id="menu">
+ <h1>NAZATIAN<br>RUNNER</h1><h2 style="font-size:clamp(16px,4.5vw,24px);color:#fff">The Great Escape · দ্য গ্রেট এস্কেপ</h2>
+ <p>নাজাতীয়ানকে দারোয়ান চাচার হাত থেকে বাঁচাও!</p>
+ <p id="bestm"></p>
+ <button class="b g" id="play">▶ START GAME / খেলা শুরু</button>
+ <button class="b s" id="howb">কীভাবে খেলবে</button>
+ <button class="b s" id="setb">⚙ সেটিংস</button>
+</div>
+<div class="ov" id="how"><div class="card"><h2>কীভাবে খেলবে</h2>
+ <p>📱 স্ক্রিনে ট্যাপ করো বা JUMP বাটন চাপো</p><p>⌨️ SPACE / ↑ = ঝাঁপ · P / ESC = বিরতি · ENTER = শুরু</p>
+ <p>🧱 ইট, বেঞ্চ, সাইনবোর্ড ও পানি এড়াও — ধাক্কা খেলে চাচা কাছে চলে আসবেন!</p>
+ <p>🪙 কয়েন কুড়াও, বেশি স্কোর করো। চাচা ধরলেই গেম শেষ।</p>
+ <p style="color:#9fd0ff">Tap to jump over obstacles, collect coins, don't get caught.</p>
+ <br><button class="b" data-home>ঠিক আছে</button></div></div>
+<div class="ov" id="pause"><h2>⏸ বিরতি / PAUSED</h2>
+ <button class="b g" id="resume">চালিয়ে যাও</button><button class="b s" data-home>হোম</button><button class="b s sb"></button><button class="b s mb"></button></div>
+<div class="ov" id="over"><div class="big">চল প্রিন্সিপাল হুজুরের কাছে</div>
+ <h2 style="font-size:clamp(18px,5vw,30px);color:#fff">দারোয়ান চাচা ধরে ফেলেছে!</h2>
+ <p id="fs" style="font-size:clamp(18px,5vw,26px);font-weight:700"></p>
+ <div class="row"><button class="b g" id="again">আবার খেলো</button><button class="b s" data-home>হোম</button><button class="b s sb"></button><button class="b s mb"></button></div></div>
+<div class="ov" id="set"><div class="card" style="max-height:92vh;overflow:auto"><h2>⚙ সেটিংস</h2><div class="row"><button class="b s sb"></button><button class="b s mb"></button></div><br><button class="b s" id="devb">ℹ Developer Info ▾</button><div id="devi" style="display:none"><h2 style="font-size:20px;margin-top:10px">Developer</h2>
+ <p><b>NAZATIAN RUNNER</b></p><p>🏃 মূল চরিত্র: নাজাতীয়ান (Nazatian)</p><p>🧑‍🏫 চেজার: দারোয়ান চাচা (Darowan Chacha)</p><p>Developer: <b>Abdullah Al Fahim</b></p><p>Studio / Brand: <b>FCITY</b> · Established 2026</p>
+ <a class="l" href="https://www.facebook.com/share/1W6RfPyvB8/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="24" fill="#1877f2"/><path d="M26.5 38V26h4l.6-4.7h-4.6v-3c0-1.4.4-2.3 2.300-2.300h2.400v-4.200c-.4 0-1.800-.2-3.500-.2-3.500 0-5.800 2.100-5.800 6v3.400h-4V26h4v12z" fill="#fff"/></svg><span><b>Facebook</b><br><small>facebook.com/share/1W6RfPyvB8</small></span></a>
+ <a class="l" href="https://github.com/fahimbro26" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 .3a12 12 0 0 0-3.800 23.400c.6.100.8-.3.8-.6v-2c-3.300.7-4-1.600-4-1.600-.6-1.400-1.400-1.800-1.400-1.800-1-.7.100-.7.100-.7 1.200.1 1.800 1.200 1.800 1.200 1 1.800 2.800 1.300 3.500 1 .1-.8.400-1.300.8-1.600-2.700-.3-5.500-1.300-5.500-5.900 0-1.300.5-2.400 1.200-3.200-.1-.3-.5-1.500.1-3.200 0 0 1-.3 3.300 1.200a11.500 11.500 0 0 1 6 0c2.300-1.500 3.300-1.200 3.300-1.200.7 1.700.2 2.900.1 3.200.8.800 1.200 1.900 1.200 3.200 0 4.600-2.800 5.600-5.500 5.900.4.400.8 1.100.8 2.200v3.300c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg><span><b>GitHub</b><br><small>@fahimbro26</small></span></a>
+ <p style="color:#9fd0ff">Developed by Abdullah Al Fahim</p></div><br><button class="b" data-home>বন্ধ করো</button></div></div>
+
+<div id="rot"><i>📱</i><h2>ফোন আড়াআড়ি ঘোরাও</h2><p>Please rotate your phone to landscape for the best experience.</p><button class="b s" id="rotok">তবুও খেলো / Play anyway</button></div>
+<script>
+(function(){
+'use strict';
+var $=function(i){return document.getElementById(i)},cv=$('c'),x=cv.getContext('2d'),W=800,H=400,G=330,PX=200;
+var S=Math.min(window.devicePixelRatio||1,2);cv.width=W*S;cv.height=H*S;x.setTransform(S,0,0,S,0,0);
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+var best=+ls('nr_best')||0,tot=+ls('nr_coins')||0,snd=ls('nr_snd')!=='0',seen=ls('nr_seen')==='1';
+var FONT="'Noto Sans Bengali','Hind Siliguri','Kohinoor Bangla','Nirmala UI',Vrinda,Arial,sans-serif";
+var st='menu',p,ob,co,sp,dist,coins,score,shown,sd,slow,inv,shake,t,ct,d,jbuf,lt,bx=0,ph=0,last=0;
+var TY=[{w:52,h:42,k:'brick'},{w:92,h:34,k:'bench'},{w:42,h:52,k:'sign'},{w:76,h:6,k:'puddle'}];
+var ac;
+function beep(f,du,ty,v,f2){if(!snd)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();var o=ac.createOscillator(),g=ac.createGain(),n=ac.currentTime;o.type=ty||'square';o.frequency.setValueAtTime(f,n);if(f2)o.frequency.exponentialRampToValueAtTime(f2,n+du);g.gain.setValueAtTime(v||.06,n);g.gain.exponentialRampToValueAtTime(.001,n+du);o.connect(g);g.connect(ac.destination);o.start(n);o.stop(n+du)}catch(e){}}
+function gac(){ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();return ac}
+var mus=ls('nr_mus')!=='0',musT=0,nT=0,ms=0,mg;
+var LD=[12,-1,15,-1,17,-1,15,12,-1,10,12,-1,15,-1,12,-1,17,-1,19,-1,17,15,12,-1,10,-1,12,15,12,-1,-1,-1],BS=[0,0,-4,-2];
+function nt(f,t,du,ty,v){var o=ac.createOscillator(),g=ac.createGain();o.type=ty;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+du);o.connect(g);g.connect(mg);o.start(t);o.stop(t+du+.02)}
+function sch(){var q=60/150/4;while(nT<ac.currentTime+.2){var s=ms%32;
+ if(LD[s]>=0)nt(220*Math.pow(2,LD[s]/12),nT,q*1.6,'square',.07);
+ if(s%2===0)nt(110*Math.pow(2,BS[s>>3]/12),nT,q*1.8,'triangle',.22);
+ if(s%4===0){var o=ac.createOscillator(),g=ac.createGain();o.frequency.setValueAtTime(160,nT);o.frequency.exponentialRampToValueAtTime(40,nT+.12);g.gain.setValueAtTime(.4,nT);g.gain.exponentialRampToValueAtTime(.001,nT+.14);o.connect(g);g.connect(mg);o.start(nT);o.stop(nT+.15)}
+ if(s%2===1)nt(7000,nT,.03,'square',.015);
+ nT+=q;ms++}}
+function musStart(){if(!mus||musT)return;try{gac();if(!mg){mg=ac.createGain();mg.gain.value=.5;mg.connect(ac.destination)}nT=ac.currentTime+.05;musT=setInterval(sch,30)}catch(e){}}
+function musStop(){clearInterval(musT);musT=0}
+function goFS(){try{if(!matchMedia('(pointer:coarse)').matches)return;var e=document.documentElement;if(!document.fullscreenElement&&e.requestFullscreen){e.requestFullscreen().then(function(){return screen.orientation&&screen.orientation.lock?screen.orientation.lock('landscape'):0}).catch(function(){})}else if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(function(){})}catch(e){}}
+var rotOk=false;
+function chk(){var por=innerHeight>innerWidth&&matchMedia('(pointer:coarse)').matches,sh=por&&!rotOk;$('rot').classList.toggle('on',sh);if(sh&&st==='play')pause()}
+function reset(){p={y:G,vy:0,air:false};ob=[];co=[];sp=300;dist=0;coins=0;score=0;shown=0;sd=500;slow=0;inv=0;shake=0;t=0;ct=0;d=230;jbuf=0;lt=0}
+reset();
+function ovs(id){var a=document.querySelectorAll('.ov');for(var i=0;i<a.length;i++)a[i].classList.remove('on');if(id)$(id).classList.add('on');var pl=st==='play';$('pb').style.display=pl?'block':'none';$('jb').style.display=(pl||st==='catch')?'block':'none';$('dots').style.display=st==='menu'?'block':'none'}
+function sbUpd(){var a=document.querySelectorAll('.sb'),m=document.querySelectorAll('.mb'),i;for(i=0;i<a.length;i++)a[i].textContent=snd?'🔊 ইফেক্ট চালু':'🔇 ইফেক্ট বন্ধ';for(i=0;i<m.length;i++)m[i].textContent=mus?'🎵 মিউজিক চালু':'🎵 মিউজিক বন্ধ'}
+function home(){musStop();st='menu';reset();$('bestm').textContent='BEST: '+best+' · 🪙 '+tot;ovs('menu')}
+function start(){reset();last=0;st='play';ovs(null);goFS();musStop();musStart();chk();beep(520,.12,'square',.06,880)}
+function pause(){if(st==='play'){musStop();st='pause';ovs('pause')}}
+function resume(){if(st==='pause'){st='play';ovs(null);last=0;musStart()}}
+function over(){musStop();st='over';if(score>best){best=score;ls('nr_best',best)}tot+=coins;ls('nr_coins',tot);ls('nr_seen','1');seen=true;$('fs').textContent='SCORE: '+score+'  ·  BEST: '+best;ovs('over')}
+function jump(){if(st!=='play')return;jbuf=.12}
+function snow(){snd=!snd;ls('nr_snd',snd?'1':'0');sbUpd();beep(660,.1)}
+// UI wiring
+$('play').onclick=function(){beep(440,.05);start()};$('again').onclick=start;$('resume').onclick=resume;
+$('howb').onclick=function(){beep(440,.05);ovs('how')};$('pb').onclick=pause;$('setb').onclick=function(){beep(440,.05);ovs('set')};$('devb').onclick=function(){var e=$('devi'),o=e.style.display==='none';e.style.display=o?'block':'none';this.textContent=o?'ℹ Developer Info ▴':'ℹ Developer Info ▾';if(o)e.scrollIntoView({block:'end'})};$('dots').onclick=function(){beep(440,.05);ovs('set')};
+var hs=document.querySelectorAll('[data-home]');for(var i=0;i<hs.length;i++)hs[i].onclick=function(){beep(330,.06);home()};
+var sbs=document.querySelectorAll('.sb');for(i=0;i<sbs.length;i++)sbs[i].onclick=snow;var mbs=document.querySelectorAll('.mb');for(i=0;i<mbs.length;i++)mbs[i].onclick=function(){mus=!mus;ls('nr_mus',mus?'1':'0');sbUpd();if(!mus)musStop();else if(st==='play')musStart();beep(660,.1)};$('rotok').onclick=function(){rotOk=true;chk()};window.addEventListener('resize',chk);window.addEventListener('orientationchange',chk);
+function pd(e){e.preventDefault();jump()}
+cv.addEventListener('pointerdown',pd);$('jb').addEventListener('pointerdown',pd);
+['touchmove','gesturestart','contextmenu'].forEach(function(n){document.addEventListener(n,function(e){if(st==='play'||st==='catch')e.preventDefault()},{passive:false})});
+window.addEventListener('keydown',function(e){var k=e.code;
+ if(k==='Space'||k==='ArrowUp'){if(st==='play'){e.preventDefault();if(!e.repeat)jump()}else if(st==='menu'||st==='over'){e.preventDefault();start()}}
+ else if(k==='Enter'){if(st==='menu'||st==='over')start();else if(st==='pause')resume()}
+ else if(k==='Escape'||k==='KeyP'){if(st==='play')pause();else if(st==='pause')resume()}});
+document.addEventListener('visibilitychange',function(){if(document.hidden)pause()});
+window.addEventListener('blur',pause);
+// spawning
+function spawn(){var ty=TY[Math.random()*TY.length|0],o={x:W+60,w:ty.w,h:ty.h,k:ty.k,hit:false};ob.push(o);
+ if(Math.random()<.65){var n=4;for(var i=0;i<n;i++)co.push({x:o.x+o.w/2+(i-1.5)*34,y:G-62-(ty.h>10?70:30)*Math.sin(Math.PI*(i+.5)/n),i:i})}
+ sd=o.w+sp*(.85+Math.random()*.7)+110}
+function update(dt){
+ t+=dt;sp=Math.min(300+t*5,620);var v=sp*(slow>0?.55:1);slow-=dt;inv-=dt;shake-=dt;lt=Math.max(0,lt-dt*3);
+ bx+=v*dt;ph+=v*dt/28;
+ if(jbuf>0){jbuf-=dt;if(!p.air){p.vy=-860;p.air=true;jbuf=0;beep(380,.15,'square',.05,760)}}
+ p.vy+=2400*dt;p.y+=p.vy*dt;if(p.y>=G){p.y=G;p.vy=0;if(p.air){p.air=false;lt=.15}}
+ sd-=v*dt;if(sd<=0)spawn();
+ var tp=p.y-54;
+ for(var i=ob.length-1;i>=0;i--){var o=ob[i];o.x-=v*dt;if(o.x<-120){ob.splice(i,1);continue}
+  if(inv<=0&&!o.hit&&PX-15<o.x+o.w&&PX+15>o.x&&p.y>G-o.h&&tp<G){o.hit=true;var pu=o.k==='puddle';d-=pu?25:55;slow=pu?.6:1;inv=1;shake=.25;beep(pu?220:120,.25,'sawtooth',.09,60)}}
+ for(i=co.length-1;i>=0;i--){var c=co[i];c.x-=v*dt;if(c.x<-40){co.splice(i,1);continue}
+  if(Math.abs(c.x-PX)<26&&Math.abs(c.y-(p.y-28))<36){co.splice(i,1);coins++;beep(988,.1,'square',.05,1318)}}
+ if(inv<=0&&d<240)d=Math.min(240,d+9*dt);
+ dist+=v*dt/10;score=Math.floor(dist)+coins*10;shown+=(score-shown)*Math.min(1,dt*10);
+ if(d<=45){st='catch';ct=0;beep(200,.5,'sawtooth',.08,50)}}
+// drawing
+function bld(o){x.fillStyle='#e8d3a0';x.fillRect(o,120,400,210);x.fillStyle='#c9b07a';x.fillRect(o,200,400,4);x.fillRect(o,270,400,4);
+ for(var i=0;i<20;i++)x.fillRect(o+i*20,112,12,8);
+ x.fillStyle='#5b6f86';for(var r=0;r<3;r++)for(var c=0;c<8;c++){var cx=o+25+c*48,cy=150+r*52;if(r===2&&c>2&&c<5)continue;x.beginPath();x.arc(cx,cy,10,Math.PI,0);x.lineTo(cx+10,cy+16);x.lineTo(cx-10,cy+16);x.fill()}
+ x.fillStyle='#4a4a55';x.fillRect(o+170,255,60,75);x.fillStyle='#c9962a';x.beginPath();x.arc(o+200,262,24,Math.PI,0);x.fill();x.fillStyle='#e0b043';x.fillRect(o+176,262,48,68)}
+function tree(o){x.fillStyle='#5a3b1e';x.fillRect(o+20,245,12,85);x.fillStyle='#2f7d32';[[26,232,38],[6,256,28],[46,256,28]].forEach(function(a){x.beginPath();x.arc(o+a[0],a[1],a[2],0,7);x.fill()});x.fillStyle='#4aa44a';x.beginPath();x.arc(o+18,226,18,0,7);x.fill()}
+function person(px,py,pf,c,air,sq){x.save();x.translate(px,py);x.scale(c.s*(1+sq),c.s*(1-sq));x.lineCap='round';
+ x.strokeStyle=c.pant;x.lineWidth=8;for(var k=1;k>=-1;k-=2){var fx=air?k*14:k*Math.sin(pf)*18,fy=air?(k<0?-14:-4):-4-Math.max(0,-k*Math.cos(pf))*9;x.beginPath();x.moveTo(0,-24);x.lineTo(fx,fy);x.stroke();x.fillStyle='#222';x.fillRect(fx-4,fy-1,13,5)}
+ x.rotate(.12);if(c.bag){x.fillStyle='#1c2b5a';x.fillRect(-24,-52,13,26)}
+ x.fillStyle=c.body;x.fillRect(-13,-54,26,32);
+ x.strokeStyle=c.body;x.lineWidth=6;x.beginPath();x.moveTo(0,-48);x.lineTo(c.arm,-44+(air?-8:Math.sin(pf+1)*6));x.stroke();
+ if(c.stick){x.strokeStyle='#6b4423';x.lineWidth=4;x.beginPath();x.moveTo(-6,-42);x.lineTo(-30,-18);x.stroke()}
+ x.fillStyle='#e0a878';x.beginPath();x.arc(3,-65,11,0,7);x.fill();
+ if(c.beard){x.fillStyle='#1a1a1a';x.beginPath();x.arc(4,-63,11,.2,Math.PI-.2);x.fill()}
+ x.fillStyle='#fff';x.fillRect(-8,-80,22,9);x.fillStyle='#111';x.fillRect(8,-66,3,3);x.fillRect(5,-71,7,2);x.restore()}
+var ST={s:1,pant:'#fff',body:'#fff',arm:22,bag:1},MM={s:1.15,pant:'#f4f4f4',body:'#1e8a4c',arm:30,stick:1,beard:1};
+function obs(o){var y=G-o.h;
+ if(o.k==='brick'){for(var r=0;r<3;r++)for(var c=0;c<3-(r>1?1:0);c++){x.fillStyle=(r+c)%2?'#a8442b':'#bd5535';x.fillRect(o.x+c*17+(r%2)*6-(r>1?-8:0),y+r*14,16,13)}}
+ else if(o.k==='bench'){x.fillStyle='#6b4423';x.fillRect(o.x,y,o.w,8);x.fillRect(o.x+8,y+8,8,26);x.fillRect(o.x+o.w-16,y+8,8,26);x.fillStyle='#8a5a30';x.fillRect(o.x,y,o.w,3)}
+ else if(o.k==='sign'){x.fillStyle='#5a3a1a';x.fillRect(o.x+5,y+30,6,22);x.fillRect(o.x+o.w-11,y+30,6,22);x.fillStyle='#7b4f26';x.fillRect(o.x,y,o.w,32);x.fillStyle='#fff';x.font='bold 10px '+FONT;x.textAlign='center';x.fillText('সাবধান',o.x+o.w/2,y+20)}
+ else{x.fillStyle='#7ec8ee';x.beginPath();x.ellipse(o.x+o.w/2,G+2,o.w/2,6,0,0,7);x.fill();x.fillStyle='#bfe9ff';x.beginPath();x.ellipse(o.x+o.w/2-8,G,14,2,0,0,7);x.fill()}}
+function panel(a,b,w,h){x.fillStyle='rgba(8,25,55,.85)';x.strokeStyle='#3f86d6';x.lineWidth=2;x.beginPath();x.roundRect?x.roundRect(a,b,w,h,10):x.rect(a,b,w,h);x.fill();x.stroke()}
+function draw(){
+ x.save();if(shake>0&&st==='play')x.translate((Math.random()-.5)*8,(Math.random()-.5)*8);
+ var g=x.createLinearGradient(0,0,0,G);g.addColorStop(0,'#3a9bf5');g.addColorStop(1,'#c4e8ff');x.fillStyle=g;x.fillRect(-10,-10,W+20,H+20);
+ x.fillStyle='rgba(255,255,255,.85)';for(var i=0;i<4;i++){var cx=((i*260-bx*.05)%1040+1040)%1040-120;x.beginPath();x.ellipse(cx,50+i%2*30,50,14,0,0,7);x.ellipse(cx+30,42+i%2*30,34,14,0,0,7);x.fill()}
+ for(var o=-(bx*.2%420);o<W;o+=420)bld(o);
+ for(o=-(bx*.5%230);o<W;o+=230)tree(o);
+ x.fillStyle='#c0392b';x.fillRect(0,G-36,W,3);x.fillRect(0,G-4,W,3);for(o=-(bx*.8%34);o<W;o+=34)x.fillRect(o,G-36,3,36);
+ x.fillStyle='#d9b57a';x.fillRect(0,G,W,H-G);x.fillStyle='#b8925a';x.fillRect(0,G,W,3);for(o=-(bx%80);o<W;o+=80){x.fillRect(o,G+22,36,3);x.fillRect(o+40,G+48,30,3)}
+ x.textAlign='center';
+ for(i=0;i<ob.length;i++)obs(ob[i]);
+ for(i=0;i<co.length;i++){var c=co[i],sx=Math.abs(Math.cos(t*4+c.i));x.save();x.translate(c.x,c.y);x.scale(.25+.75*sx,1);x.fillStyle='#e8a900';x.beginPath();x.arc(0,0,11,0,7);x.fill();x.fillStyle='#ffd23a';x.beginPath();x.arc(0,0,8.500,0,7);x.fill();x.fillStyle='#fff3a0';x.font='bold 12px sans-serif';x.fillText('★',0,4);x.restore()}
+ x.fillStyle='rgba(0,0,0,.18)';x.beginPath();x.ellipse(PX,G+4,22,5,0,0,7);x.fill();x.beginPath();x.ellipse(PX-d,G+4,26,5,0,0,7);x.fill();
+ var mp=st==='menu'?0:ph;
+ person(PX-d,G,mp,MM,false,0);
+ if(!(inv>0&&st==='play'&&(t*20|0)%2))person(PX,p.y,ph,ST,p.air,lt);
+ x.font='bold 11px '+FONT;x.textAlign='center';x.fillStyle='#fff';x.strokeStyle='#000';x.lineWidth=3;[['নাজাতীয়ান',PX,p.y-92],['দারোয়ান চাচা',PX-d,G-98]].forEach(function(a){x.strokeText(a[0],a[1],a[2]);x.fillText(a[0],a[1],a[2])});
+ if(st==='catch'||st==='over'){x.font='bold 22px '+FONT;x.fillStyle='#fff';x.strokeStyle='#000';x.lineWidth=4;x.strokeText('ধরেছি! 😡',PX-d+30,G-126);x.fillText('ধরেছি! 😡',PX-d+30,G-126)}
+ x.restore();
+ if(st!=='menu'){
+  x.save();x.translate(14,0);panel(58,10,150,40);panel(216,10,150,40);panel(374,10,110,40);
+  x.textAlign='left';x.font='bold 11px '+FONT;x.fillStyle='#8cc4ff';x.fillText('SCORE',66,24);x.fillText('BEST',224,24);
+  x.font='bold 20px monospace';x.fillStyle='#fff';x.fillText(String(Math.round(shown)).padStart(6,'0'),66,44);x.fillText(String(Math.max(best,score)).padStart(6,'0'),224,44);
+  x.fillStyle='#ffd23a';x.beginPath();x.arc(392,30,11,0,7);x.fill();x.fillStyle='#fff';x.font='bold 20px monospace';x.fillText('x'+coins,410,37);
+  panel(500,10,276,40);x.font='bold 12px '+FONT;x.fillStyle='#fff';x.fillText('নাজাতীয়ান',510,25);
+  var f=Math.max(0,Math.min(1,(d-45)/195));x.fillStyle='#233';x.fillRect(510,32,256,9);x.fillStyle=f<.35?'#ff4d4d':f<.65?'#ffb020':'#4ade80';x.fillRect(510,32,256*f,9);
+  x.restore();
+  if(!seen&&st==='play'&&t<6){x.textAlign='center';x.font='bold 24px '+FONT;x.fillStyle='#fff';x.strokeStyle='#000';x.lineWidth=5;var m='ট্যাপ / SPACE চাপো — ঝাঁপ দাও!';x.strokeText(m,W/2,150);x.fillText(m,W/2,150)}}}
+function frame(ts){
+ var dt=last?Math.min((ts-last)/1000,.033):0;last=ts;
+ if(st==='play')update(dt);
+ else if(st==='catch'){ct+=dt;t+=dt;ph+=dt*14;d=Math.max(0,d-260*dt);p.vy+=2400*dt;p.y=Math.min(G,p.y+p.vy*dt);if(p.y>=G)p.vy=0;if(ct>.9)over()}
+ else if(st==='menu'){bx+=120*dt;ph+=dt*9;t+=dt}
+ else last=st==='pause'?0:last;
+ draw();requestAnimationFrame(frame)}
+sbUpd();home();requestAnimationFrame(frame);
+})();
+</script></body></html>
